@@ -1,0 +1,19 @@
+// -----------------------LOGOUT BUTTON HOVER---------------------------------------------------
+
+.button1 {
+    background-color: #f3f7fe;
+    color: #588157;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    width: 70px;
+    height: 40px;
+    transition: 0.3s;
+    margin-top: 3px;
+}
+
+.button1:hover {
+    background-color: #588157;
+    box-shadow: 0 0 0 5px #3a5a40;
+    color: #fff;
+}
