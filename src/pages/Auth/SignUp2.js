@@ -28,12 +28,13 @@ export default function SignUp2() {
     function parseContent(content) {
         const lines = content.split("\n");
         const parsed = [];
-
+        let id = 0
         lines.forEach((line) => {
             if (line.startsWith("**") && line.endsWith("**")) {
                 parsed.push({ type: "header", text: line.slice(2, line.length - 2) });
             } else if (line.trim() !== "") {
-                parsed.push({ type: "task", text: line.slice(2) });
+                parsed.push({ type: "task", text: line.slice(2) ,id:id , checked:false});
+                id++
             }
         });
 
@@ -99,6 +100,7 @@ export default function SignUp2() {
                 const response = await dietGenerationFunction(age, weight, height,gender);
                 const content = response.choices[0]?.message?.content || "";
                 const parsedContent = parseContent(content);
+                parsedContent.shift();
                 const dietPlan = { plan: parsedContent }
                 await setDoc(doc(firestore, "Diet", user.uid), dietPlan);
 

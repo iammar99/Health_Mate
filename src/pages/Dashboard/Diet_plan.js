@@ -3,10 +3,13 @@ import { doc, getDoc } from "firebase/firestore";
 import { firestore } from 'Config/Firebase';
 import Groq from 'groq-sdk';
 import { setDoc } from 'firebase/firestore';
+import PorgressCard from 'components/OtherComponents/PorgressCard';
 
 export default function Diet_plan() {
 
     const [plan, setPlan] = useState([])
+    const [single, setSingle] = useState(0)
+    const [score, setScore] = useState(0)
     const [loading, setLoading] = useState(false)
     const user = JSON.parse(localStorage.getItem("User"))
     const API_KEY = process.env.REACT_APP_GROQ_API;
@@ -19,13 +22,24 @@ export default function Diet_plan() {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-            console.log("Document data:", docSnap.data());
             setPlan(docSnap.data().plan)
         } else {
             // docSnap.data() will be undefined in this case
         }
+        let ans = 0
+        for(let i = 0 ; i < docSnap.data().plan.length ; i++){
+            if(docSnap.data().plan[i].type == "task"){
+                ans++
+            }
+            setSingle(100/ans)
+        }
         setLoading(false)
     }
+
+
+    useEffect(() => {
+        fetchData()
+    }, [])
 
     // Function to differentiate between task and heading 
 
@@ -72,15 +86,26 @@ export default function Diet_plan() {
         await setDoc(doc(firestore, "Diet", user.uid), dietPlan);
     }
 
-    useEffect(() => {
-        fetchData()
-    }, [])
+
+    // Function to Check checkboxes
+
+    const handleCheck = (id) => {
+        setPlan((prevPlan) =>
+            prevPlan.map((item) =>
+                item.id <= id ? { ...item, checked: true, marked: true } : item
+            )
+        );
+        setScore(single+score)
+    }
+
     return (
         <>
             <div className="container py-5">
                 <div className="row">
-                    <div className="col">
-                        <h1>This is Diet_Plan Page</h1>
+                    <div className="col-8">
+                        <h3 className="fw-bold">
+                            Hello {user.fullName} ! Here is your personalized Diet plan
+                        </h3>
                         {
                             loading
                                 ?
@@ -95,7 +120,7 @@ export default function Diet_plan() {
                                                     <strong>{item.text}</strong>
                                                 ) : (
                                                     <label>
-                                                        <input type="checkbox" />
+                                                        <input type="checkbox" className='ms-5' disabled={item.checked} onChange={() => { handleCheck(item.id) }} />
                                                         <span style={{ marginLeft: "10px" }}>{item.text}</span>
                                                     </label>
                                                 )}
@@ -104,9 +129,9 @@ export default function Diet_plan() {
                                     </ul>
                                 )
                         }
-                        {/* <button className="btn btn-info" onClick={handleGenrate}>
-                            Generate
-                        </button> */}
+                    </div>
+                    <div className="col-4">
+                        <PorgressCard score={score}/>
                     </div>
                 </div>
             </div>
