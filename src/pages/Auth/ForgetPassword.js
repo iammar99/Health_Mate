@@ -19,6 +19,7 @@ export default function ForgetPassword() {
         console.log('email', email)
         if (!email) {
             message.error("Enter Your Email")
+            setIsLoading(false)
             return;
         }
         sendPasswordResetEmail (auth, email)
@@ -34,19 +35,6 @@ export default function ForgetPassword() {
         .finally(()=>{
             setIsLoading(false)
         })
-        // else {
-        //     for (let i = 0; i < users.length; i++) {
-        //         if (email == users[i].email) {
-        //             navigate("/auth/resetpassword")
-        //             localStorage.setItem("email", email)
-        //             break;
-        //         }
-        //         else {
-        //             message.error("This Email Doesn't Found")
-        //             return;
-        //         }
-        //     }
-        // }
     }
 
     return (

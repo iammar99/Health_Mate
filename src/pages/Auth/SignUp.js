@@ -2,9 +2,6 @@ import React, { useState } from 'react'
 import { Input, Form, message } from 'antd'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthContext } from '../../context/AuthContext'
-import { createUserWithEmailAndPassword } from "firebase/auth"
-import { auth, firestore } from '../../Config/Firebase'
-import {  setDoc , doc } from "firebase/firestore";
 
 const initialState = { fullName: "", email: "", password: "", confirmPassword: "", role: "student", status: "active", dateCreated: new Date().getHours() + ":" + new Date().getMinutes() + ":" + new Date().getSeconds() }
 
@@ -24,75 +21,53 @@ export default function SignUp() {
         e.preventDefault();
         let { fullName, email, password, confirmPassword } = state;
         setIsLoading(true)
-        fullName = fullName.trim();
-        email = email.trim();
-        password = password.trim();
-        confirmPassword = confirmPassword.trim();
         if (!fullName) {
             message.error("Please Enter Your Full Name");
+            setIsLoading(false)
             return;
         }
         if (fullName.length < 3) {
             message.error("Please Enter Your Name Correctly");
+            setIsLoading(false)
             return;
         }
         if (!email) {
             message.error("Please Enter Your Email");
+            setIsLoading(false)
             return;
         }
         if (!password) {
             message.error("Please Enter Your Password");
+            setIsLoading(false)
             return;
         }
-        if (password.length < 6) {
-            message.error("Please Enter 6 character or more");
+        if (password.length < 8) {
+            message.error("Please Enter 8 character or more");
+            setIsLoading(false)
             return;
         }
         if (!confirmPassword) {
             message.error("Please Enter Your Confirm Password");
+            setIsLoading(false)
             return;
         }
-        if (confirmPassword.length < 6) {
-            message.error("Please Enter 6 character or more");
+        if (confirmPassword.length < 8) {
+            message.error("Please Enter 8 character or more");
+            setIsLoading(false)
             return;
         }
         if (confirmPassword != password) {
             message.error("Please Enter The Same Password");
+            setIsLoading(false)
             return;
         }
+        fullName = fullName.trim();
+        email = email.trim();
+        password = password.trim();
+        confirmPassword = confirmPassword.trim();
         localStorage.setItem("User", JSON.stringify(state))
-        console.log(state)
         navigate("/auth/signup2")
-
-        // createUserWithEmailAndPassword(auth, email, password)
-        //     .then (async(userCredential) => {
-        //         // Signed up 
-        //         const user = userCredential.user;
-        //         let userToStore = {
-        //             email ,
-        //             password,
-        //             userId : user.uid,
-        //             fullName
-        //         }
-        //         console.log(userToStore)
-        //         // return
-        //         // ...
-        //         // Add a new document with a generated id.
-        //         await setDoc(doc(firestore, "Users", user.uid), userToStore);
-        //         // await addDoc(collection(firestore, "Users",user.uid), state);
-
-        //         localStorage.setItem("User", JSON.stringify(state))
-        //         localStorage.setItem("token", "true")
-        //         dispatch({ type: "SET_LOGGED_IN", payload: { state } })
-        //     })
-        //     .catch((error) => {
-        //         const errorCode = error.code;
-        //         const errorMessage = error.message;
-        //         // ..
-        //     })
-        //     .finally(() => {
-        //         setIsLoading(false)
-        //     });
+        setIsLoading(false)
     }
 
     return (
@@ -124,19 +99,19 @@ export default function SignUp() {
                                     <div className="row mb-2">
                                         <div className="col">
                                             <h6>Password</h6>
-                                            <Input.Password type="password" onChange={handleChange} name="password" id="password" className='form-control w-100 d-flex' placeholder='Enter 6 character or more' />
+                                            <Input.Password type="password" onChange={handleChange} name="password" id="password" className='form-control w-100 d-flex' placeholder='Enter 8 character or more' />
                                         </div>
                                     </div>
                                     <div className="row">
                                         <div className="col">
                                             <h6>Confirm Password</h6>
-                                            <Input.Password type="confirmPassword" onChange={handleChange} name="confirmPassword" id="confirmPassword" className='form-control w-100 d-flex' placeholder='Enter 6 character or more' />
+                                            <Input.Password type="confirmPassword" onChange={handleChange} name="confirmPassword" id="confirmPassword" className='form-control w-100 d-flex' placeholder='Enter 8 character or more' />
                                         </div>
                                     </div>
                                     <div className="row mt-3">
                                         <div className="col">
                                             <input type="checkbox" name="" id="checkbox" />
-                                            <label for="checkbox" className='ms-2'>Remember me</label>
+                                            <label htmlFor="checkbox" className='ms-2'>Remember me</label>
                                         </div>
                                     </div>
                                     <div className="row mt-2">

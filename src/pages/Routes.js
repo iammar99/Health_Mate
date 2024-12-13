@@ -12,7 +12,7 @@ export default function Index() {
   const {isAuthenicated} = useAuthContext() 
 
   return (
-    <main>
+    <>
         <Routes>
         <Route path='/auth/*' element={!isAuthenicated ? <Auth /> : <Navigate to={"/"}/>} />
             <Route path='/dashboard/*' element={<PrivateRoute Component={Dashboard}/>} />
@@ -20,7 +20,7 @@ export default function Index() {
 
             <Route path='*' element={<NoPage/>} />
         </Routes>
-    </main>
+    </>
   )
 }
 

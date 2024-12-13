@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="container">
           <div className="row">
             <div className="col">
-              <p className="mb-0 text-center text-white">&copy;{year}.All Rights Reserved By <b><a className='text-decoration-none text-white' href="https://awais-portfolio.vercel.app">Muhammad Awais Mehboob</a></b></p>
+              <p className="mb-0 text-center text-white">&copy; {year} | All Rights Reserved</p>
             </div>
           </div>
         </div>

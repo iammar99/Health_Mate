@@ -30,11 +30,18 @@ export default function Login() {
         email = email.trim();
         password = password.trim();
         if (!email) {
-            message.error("Please Enter Your Email");
+            message.error("Please Enter Your Email")
+            setIsloading(false)
             return;
         }
-        if (!password) {
+        if (!password ) {
             message.error("Please Enter Your Password");
+            setIsloading(false)
+            return;
+        }
+        if (password.length < 8) {
+            message.error("Please Enter Valid Password");
+            setIsloading(false)
             return;
         }
         // let registerUser = JSON.parse(localStorage.getItem("users"))
@@ -118,7 +125,7 @@ export default function Login() {
                                     <div className="row mt-3">
                                         <div className="col">
                                             <input type="checkbox" name="" id="checkbox" />
-                                            <label for="checkbox" className='ms-2'>Remember me</label>
+                                            <label htmlFor="checkbox" className='ms-2'>Remember me</label>
                                         </div>
                                     </div>
                                     <div className="row mt-2">

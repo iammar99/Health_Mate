@@ -5,14 +5,15 @@ import { useAuthContext } from '../../context/AuthContext'
 import { createUserWithEmailAndPassword } from "firebase/auth"
 import { auth, firestore } from '../../Config/Firebase'
 import { setDoc, doc } from "firebase/firestore";
+import Groq from 'groq-sdk'
 
-const initialState = { gender: "", age: "", height: "", weight: "" }
+
 
 export default function SignUp2() {
 
-    // let users = [];
-    // users = JSON.parse(localStorage.getItem("users")) ? JSON.parse(localStorage.getItem("users")) : [];
-    const User = localStorage.getItem("User")
+    const API_KEY = process.env.REACT_APP_GROQ_API;
+    const groq = new Groq({ apiKey: API_KEY, dangerouslyAllowBrowser: true });
+    const User = JSON.parse(localStorage.getItem("User"))
     const [state, setState] = useState({});
     const { dispatch, user } = useAuthContext()
     const [isLoading, setIsLoading] = useState(false)
@@ -21,62 +22,97 @@ export default function SignUp2() {
     const handleChange = e => {
         setState({ ...state, [e.target.name]: e.target.value })
     }
+
+    // Function to differentiate between task and heading 
+
+    function parseContent(content) {
+        const lines = content.split("\n");
+        const parsed = [];
+
+        lines.forEach((line) => {
+            if (line.startsWith("**") && line.endsWith("**")) {
+                parsed.push({ type: "header", text: line.slice(2, line.length - 2) });
+            } else if (line.trim() !== "") {
+                parsed.push({ type: "task", text: line.slice(2) });
+            }
+        });
+
+        return parsed;
+    }
+
+
+    // Function to generate diet plan 
+
+    async function dietGenerationFunction(age, weight, height,gender) {
+        return groq.chat.completions.create({
+            messages: [
+                {
+                    role: "user",
+                    content: `Act as a professional nutritionist. Based on the following user data, generate a personalized diet plan. Include only the diet plan in the response. Do not include hydration tips, explanations, or any additional information. Provide meal sections like Breakfast, Mid-morning snack, Lunch, Evening snack, and Dinner with food items and portion sizes in **grams** (not ounces). Ensure the portion sizes are realistic and appropriate for the user’s needs.\n
+                    **User Details**:\n
+                    - Height: ${height}\n
+                    - Gender: ${gender}\n
+                    - Weight: ${weight}\n
+                    - Age: ${age}\n\n`,
+                }
+
+            ],
+            model: "llama3-8b-8192", // Your specified model
+        });
+    }
+
     const signUp = e => {
         e.preventDefault();
-        const mergedObject = {...User,...state}
-        let { fullName,email, password, gender, age, height, weight } = mergedObject;
+        const mergedObject = { ...User, ...state }
+        let { fullName, email, password, gender, age, height, weight } = mergedObject;
         setIsLoading(true)
-        gender = gender.trim();
-        age = age.trim();
-        height = height.trim();
-        weight = weight.trim();
         if (!gender) {
             message.error("Please Enter Your Full Name");
+            setIsLoading(false)
             return;
         }
         if (!age) {
             message.error("Please Enter Your Age");
+            setIsLoading(false)
             return;
         }
         if (!height) {
             message.error("Please Enter Your Height");
+            setIsLoading(false)
             return;
         }
         if (!weight) {
             message.error("Please Enter Your Weight");
+            setIsLoading(false)
             return;
         }
-        console.log(mergedObject)
-        navigate("/")
+        gender = gender.trim();
+        age = age.trim();
+        height = height.trim();
+        weight = weight.trim();
         createUserWithEmailAndPassword(auth, email, password)
             .then(async (userCredential) => {
                 // Signed up 
                 const user = userCredential.user;
-                let userToStore = {
-                    email,
-                    password,
-                    userId: user.uid,
-                    fullName,
-                    gender,
-                    age,
-                    height,
-                    weight
-                }
-                console.log(userToStore)
-                // return
-                // ...
-                // Add a new document with a generated id.
-                await setDoc(doc(firestore, "Users", user.uid), userToStore);
-                // await addDoc(collection(firestore, "Users",user.uid), state);
+
+                mergedObject.userId = user.uid
+                const response = await dietGenerationFunction(age, weight, height,gender);
+                const content = response.choices[0]?.message?.content || "";
+                const parsedContent = parseContent(content);
+                const dietPlan = { plan: parsedContent }
+                await setDoc(doc(firestore, "Diet", user.uid), dietPlan);
+
+                await setDoc(doc(firestore, "Users", user.uid), mergedObject);
 
                 localStorage.setItem("User", JSON.stringify(mergedObject))
                 localStorage.setItem("token", "true")
-                dispatch({ type: "SET_LOGGED_IN", payload: { state } })
+                dispatch({ type: "SET_LOGGED_IN", payload: { mergedObject } })
                 message.success("A new user added successfully");
             })
             .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
+                console.log(error)
                 // ..
             })
             .finally(() => {
@@ -121,7 +157,7 @@ export default function SignUp2() {
                                     <div className="row mt-3">
                                         <div className="col">
                                             <input type="checkbox" name="" id="checkbox" />
-                                            <label for="checkbox" className='ms-2'>Remember me</label>
+                                            <label htmlFor="checkbox" className='ms-2'>Remember me</label>
                                         </div>
                                     </div>
                                     <div className="row mt-2">

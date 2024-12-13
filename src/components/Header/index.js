@@ -9,7 +9,7 @@ export default function Header() {
 
     return (
         <>
-        {isAuthenicated?  <Navbar/> : <Topbar/>}
+        <Navbar/>
         </>
     )
 }

@@ -15,7 +15,7 @@ export default function Topbar() {
                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                             <li className="nav-item dropdown">
-                                <button className="nav-link menu__link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Authenticated</button>
+                                <button className="nav-link menu__link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Authentication</button>
                                 <ul className="dropdown-menu">
                                     <li><Link to="/auth/login" className="dropdown-item" href="#">Login</Link></li>
                                     <li><Link to="/auth/signup" className="dropdown-item" href="#">SignUp</Link></li>
